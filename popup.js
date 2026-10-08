@@ -2,6 +2,9 @@ import { DEFAULT_SETTINGS, PRESETS, normalizeSettings, siteLabel } from "./share
 
 const $ = id => document.getElementById(id);
 const isExtension = Boolean(globalThis.chrome?.runtime?.id);
+const launchParams = new URLSearchParams(location.search);
+const isDetached = launchParams.get("window") === "1";
+document.body.classList.toggle("detached", isDetached);
 const request = isExtension ? async (type, payload = {}) => {
   const response = await chrome.runtime.sendMessage({ target: type === "meter" ? "offscreen" : "background", type, ...payload });
   if (!response?.ok) throw new Error(response?.error || "Could not reach the mixer. Reopen the extension to try again.");
@@ -16,6 +19,17 @@ let pendingUpdate = Promise.resolve();
 let updateTimer;
 let meterPending = false;
 const draftSettings = new Map();
+const launchTabId = Number(launchParams.get("tabId"));
+if (launchParams.has("tabId") && Number.isInteger(launchTabId)) {
+  selectedId = launchTabId;
+  try {
+    if (launchParams.has("settings")) draftSettings.set(launchTabId, normalizeSettings(JSON.parse(launchParams.get("settings"))));
+  } catch { /* Invalid launch settings fall back to the saved website profile. */ }
+}
+if (isDetached) {
+  // Launch settings are one-time state, so reloading cannot restore stale values.
+  history.replaceState(null, "", location.pathname + "?window=1");
+}
 const segments = Array.from({ length: 18 }, () => {
   const segment = document.createElement("span");
   segment.className = "meter-segment";
@@ -64,11 +78,12 @@ function renderConnection() {
   $("connect").textContent = busy ? "Please wait…" : connected ? "Disconnect this tab" : other && tab ? "Open tab to connect" : "Connect this tab";
   $("connect").disabled = busy || !tab;
   $("tab-select").disabled = busy || data.tabs.length === 0;
+  $("popout").disabled = busy;
   for (const id of ["volume", "volume-number", "bass", "treble", "balance", "preset", "mute", "reset", "reset-menu", "limiter"]) $(id).disabled = busy || !tab;
   document.querySelectorAll("[data-volume]").forEach(button => { button.disabled = busy || !tab; });
   $("hint").classList.remove("error");
   $("hint").title = "";
-  $("hint").textContent = !tab ? "Open a website that plays audio, then click this extension in the toolbar." : tab.nativeMuted ? "This tab is muted in Chrome. Unmute the browser tab to hear its audio." : connected ? "Audio stays connected when you close this window." : other ? "Switch to this tab, then open the extension from its toolbar to connect." : "Connect a tab to start. Your other tabs keep their own volume.";
+  $("hint").textContent = !tab ? "Open a website that plays audio, then click this extension in the toolbar." : tab.nativeMuted ? "This tab is muted in Chrome. Unmute the browser tab to hear its audio." : connected ? "Audio stays connected when you close this window." : other ? "Switch to this tab, then open the extension from its toolbar to connect." : isDetached ? "For a new tab, open its toolbar extension before connecting here." : "Connect a tab to start. Your other tabs keep their own volume.";
   $("engine-status").textContent = `${data.sessions.length} ${data.sessions.length === 1 ? "tab" : "tabs"} connected`;
   if (!connected) setMeter(0);
 }
@@ -110,7 +125,7 @@ function renderSites() {
 
 function selectTab(tabId) {
   selectedId = tabId;
-  settings = normalizeSettings(draftSettings.get(tabId) || currentSession()?.settings || data.profiles[currentTab()?.host] || DEFAULT_SETTINGS);
+  settings = normalizeSettings(currentSession()?.settings || draftSettings.get(tabId) || data.profiles[currentTab()?.host] || DEFAULT_SETTINGS);
   $("tab-select").value = String(tabId);
   renderSettings(); renderConnection();
 }
@@ -145,6 +160,7 @@ function queueUpdate() {
       const result = await request("update", { tabId, settings: values });
       const session = data.sessions.find(session => session.tabId === tabId);
       if (session) session.settings = result.settings;
+      if (session && draftSettings.get(tabId) === values) draftSettings.delete(tabId);
       if (data.remember) data.profiles[host] = values;
       renderSites();
       status(!isExtension ? "Preview mode · simulated controls" : result.connected ? "Audio settings applied" : data.remember ? "Saved · connect tab to hear changes" : "Connect tab to hear changes");
@@ -200,8 +216,9 @@ $("connect").addEventListener("click", async () => {
     await flushUpdates();
     if (!currentSession() && selectedId !== data.activeTabId) {
       await request("focus", { tabId: selectedId });
-      if (isExtension) { window.close(); return; }
-      data.activeTabId = selectedId; status("Preview · tab selected");
+      if (isExtension && !isDetached) { window.close(); return; }
+      data.activeTabId = selectedId;
+      status(isExtension ? "Tab selected · open its toolbar extension to allow audio" : "Preview · tab selected");
     } else {
       const connected = Boolean(currentSession());
       data = await request(connected ? "disconnect" : "connect", { tabId: selectedId, settings });
@@ -225,6 +242,24 @@ for (const id of ["help-title", "help-menu"]) $(id).addEventListener("click", ()
 for (const id of ["close-help", "help-ok"]) $(id).addEventListener("click", () => $("help-dialog").close());
 $("close").addEventListener("click", async () => { await flushUpdates(); window.close(); });
 
+$("popout").addEventListener("click", async () => {
+  busy = true; renderConnection();
+  try {
+    await flushUpdates();
+    const panel = $("sites-panel").hidden ? "mixer" : "sites";
+    if (isExtension) {
+      await request("popout", { tabId: selectedId, settings, panel });
+      window.close();
+    } else {
+      const url = new URL(location.href);
+      url.search = new URLSearchParams({ window: "1", tabId: String(selectedId ?? ""), settings: JSON.stringify(settings), panel });
+      if (!window.open(url.href, "sound-enhancer-98", "popup,width=456,height=650")) throw new Error("Allow popups for this preview to open the mixer window.");
+      status("Opened separate preview window");
+    }
+  } catch (error) { status(error.message, true); }
+  finally { busy = false; $("popout").disabled = false; }
+});
+
 function setMeter(peak) {
   // Show a logarithmic -48 dB to 0 dB scale, not fabricated activity.
   const level = peak > 0 ? Math.min(1, Math.max(0, (20 * Math.log10(peak) + 48) / 48)) : 0;
@@ -244,9 +279,11 @@ setInterval(async () => {
 if (isExtension) setInterval(async () => {
   if (busy || updateTimer !== undefined || document.hidden) return;
   try {
-    await pendingUpdate;
+    const updates = pendingUpdate;
+    await updates;
     const fresh = await request("dashboard");
-    const signature = state => JSON.stringify([state.tabs, state.sessions.map(session => session.tabId)]);
+    if (busy || updateTimer !== undefined || updates !== pendingUpdate) return;
+    const signature = state => JSON.stringify([state.tabs, state.sessions, state.activeTabId, state.remember, state.profiles]);
     if (signature(fresh) !== signature(data)) { data = fresh; renderDashboard(); }
   } catch { /* Explicit user actions surface errors; transient polling is quiet. */ }
 }, 1800);
@@ -254,5 +291,6 @@ if (isExtension) setInterval(async () => {
 try {
   data = await request("dashboard");
   renderDashboard();
+  if (launchParams.get("panel") === "sites") switchPanel("sites");
   status(isExtension ? currentSession() ? "Connected · audio engine running" : "Ready" : "Preview mode · simulated controls");
 } catch (error) { renderConnection(); status(error.message, true); }

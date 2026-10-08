@@ -10,13 +10,14 @@
 <body>
   <div class="window">
     <header class="title-bar">
-      <div class="title"><img src="icons/speaker.svg" width="18" height="18" alt=""> Sound Enhancer 98</div>
+      <div class="title"><img src="icons/icon32.png" width="18" height="18" alt=""> Sound Enhancer 98</div>
       <div class="window-buttons"><button id="help-title" class="caption-button" aria-label="Help">?</button><button id="close" class="caption-button" aria-label="Close">×</button></div>
     </header>
     <nav class="menu-bar" aria-label="Utilities">
       <button id="reset-menu"><span class="access-key">R</span>eset mixer</button>
       <button id="help-menu"><span class="access-key">H</span>elp</button>
-      <span class="version">VERSION 1.0</span>
+      <button id="popout" title="Open the mixer in a separate browser window"><span aria-hidden="true">↗</span> Pop out</button>
+      <span class="version">VERSION 1.0.2</span>
     </nav>
     <div class="tabs" role="tablist" aria-label="Sound controls">
       <button id="mixer-tab" role="tab" aria-selected="true" aria-controls="mixer-panel" tabindex="0"><span aria-hidden="true">▥</span> Volume mixer</button>
@@ -53,12 +54,12 @@
       <div class="preset-row"><label for="preset">Sound preset:</label><select id="preset"><option value="custom">Custom</option><option value="flat">Default</option><option value="bass">Bass boost</option><option value="voice">Clear voice</option><option value="movie">Movie night</option></select><button id="reset" title="Restore 100% volume and flat tone">Reset</button></div>
       <div class="options"><label><input id="limiter" type="checkbox" checked> Reduce clipping <span class="subtle">(limiter)</span></label><label><input id="remember" type="checkbox" checked> Remember settings for each website</label></div>
       <div id="boost-note" class="boost-note"><span aria-hidden="true">ⓘ</span><span>Boost works best on quiet audio. Start at 100%.</span></div>
-      <div class="actions"><button id="mute" aria-pressed="false"><img src="icons/speaker.svg" width="16" height="16" alt=""><span>Mute</span></button><button id="connect" class="primary-button">Connect this tab</button></div>
+      <div class="actions"><button id="mute" aria-pressed="false"><img src="icons/icon32.png" width="16" height="16" alt=""><span>Mute</span></button><button id="connect" class="primary-button">Connect this tab</button></div>
       <p id="hint" class="hint">Connect a tab to start. Your other tabs keep their own volume.</p>
     </main>
 
     <section id="sites-panel" role="tabpanel" aria-labelledby="sites-tab" hidden>
-      <div class="panel-heading"><img src="icons/speaker.svg" width="32" height="32" alt=""><div><h1>A little order for your audio.</h1><p>Different websites. Different volume.</p></div></div>
+      <div class="panel-heading"><img src="icons/icon128.png" width="32" height="32" alt=""><div><h1>A little order for your audio.</h1><p>Different websites. Different volume.</p></div></div>
       <fieldset class="site-list-group"><legend>Saved website settings</legend><div id="site-list" class="site-list inset"></div></fieldset>
       <p class="site-explainer">Saved settings are restored when you connect a tab on that website. Each connected tab has its own mixer.</p>
       <div class="tip inset"><strong>A familiar sound. A familiar desktop.</strong><p>Open a website, click the extension in your toolbar, and choose <b>Connect this tab</b>. Repeat for another tab to mix them separately.</p><p>Switch between connected tabs using the audio source menu.</p></div>
@@ -70,7 +71,7 @@
 
   <dialog id="help-dialog">
     <div class="title-bar"><strong>Sound Enhancer Help</strong><button id="close-help" class="caption-button" aria-label="Close help">×</button></div>
-    <div class="dialog-body"><img src="icons/speaker.svg" width="40" height="40" alt=""><h2>Turn the web up to eleven.</h2><p>1. Open a website that plays audio.<br>2. Click Sound Enhancer in the Chrome toolbar.<br>3. Choose <b>Connect this tab</b> and adjust the mixer.</p><p><b>100% is the original volume.</b> 500% is 5× gain; 1000% is 10×. Bass and treble run from −12 to +12 dB. The limiter reduces peaks, so the perceived boost depends on the source.</p><p>Audio keeps playing when you close this window. Disconnect to restore normal website audio. Moving to a different website disconnects the tab.</p><p>Chrome internal pages and some protected media cannot be captured. This controls browser tabs, not Windows system volume.</p><p class="privacy">All processing happens on your device. Audio is never recorded or uploaded.</p><button id="help-ok">OK</button></div>
+    <div class="dialog-body"><img src="icons/icon128.png" width="40" height="40" alt=""><h2>Turn the web up to eleven.</h2><p>1. Open a website that plays audio.<br>2. Click Sound Enhancer in the Chrome toolbar.<br>3. Choose <b>Connect this tab</b> and adjust the mixer.</p><p><b>100% is the original volume.</b> 500% is 5× gain; 1000% is 10×. Bass and treble run from −12 to +12 dB. The limiter reduces peaks, so the perceived boost depends on the source.</p><p>Audio keeps playing when you close this window. Disconnect to restore normal website audio. Moving to a different website disconnects the tab.</p><p>Chrome internal pages and some protected media cannot be captured. This controls browser tabs, not Windows system volume.</p><p class="privacy">All processing happens on your device. Audio is never recorded or uploaded.</p><button id="help-ok">OK</button></div>
   </dialog>
   <script type="module" src="popup.js"></script>
 </body>

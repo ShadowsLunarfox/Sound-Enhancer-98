@@ -1,6 +1,8 @@
 :root { font-family: Tahoma, "MS Sans Serif", Arial, sans-serif; font-size: 11px; color: #161616; background: #008080; --face: #c0c0c0; --light: #fff; --shadow: #808080; --navy: #000080; }
 * { box-sizing: border-box; }
 body { margin: 0; width: 440px; height: 592px; }
+body.detached { width: 100vw; height: 100vh; min-width: 440px; min-height: 592px; }
+body.detached #popout { display: none; }
 button, select, input { font: inherit; color: inherit; }
 button { background: var(--face); border: 0; border-radius: 0; box-shadow: inset -1px -1px #000, inset 1px 1px #fff, inset -2px -2px #808080, inset 2px 2px #dfdfdf; padding: 6px 12px; min-height: 25px; cursor: pointer; }
 button:active:not(:disabled), button[aria-pressed="true"], .quick-volumes button.selected { box-shadow: inset -1px -1px #fff, inset 1px 1px #000, inset -2px -2px #dfdfdf, inset 2px 2px #808080; background: #d4d4d4; }

@@ -66,22 +66,54 @@ async function stopTab(tabId) {
   await closeIdleEngine();
 }
 
+async function activeSourceTab() {
+  const [tab] = await chrome.tabs.query({ active: true, lastFocusedWindow: true });
+  if (siteFromUrl(tab?.url)) return tab;
+  // The detached mixer is itself a focused browser window, not an audio source.
+  const browserWindow = await chrome.windows.getLastFocused({ windowTypes: ["normal"], populate: true }).catch(() => null);
+  return browserWindow?.tabs?.find(item => item.active);
+}
+
+async function openMixerWindow(message) {
+  const url = new URL(chrome.runtime.getURL("popup.html"));
+  url.searchParams.set("window", "1");
+  url.searchParams.set("panel", message.panel === "sites" ? "sites" : "mixer");
+  if (Number.isInteger(message.tabId)) {
+    const tab = await chrome.tabs.get(message.tabId);
+    if (siteFromUrl(tab.url)) {
+      url.searchParams.set("tabId", String(tab.id));
+      url.searchParams.set("settings", JSON.stringify(normalizeSettings(message.settings)));
+    }
+  }
+  const windows = await chrome.windows.getAll({ populate: true, windowTypes: ["popup"] });
+  const existing = windows.find(window => window.tabs?.some(tab => tab.url?.startsWith(chrome.runtime.getURL("popup.html") + "?window=1")));
+  if (existing) {
+    const tab = existing.tabs.find(tab => tab.url?.startsWith(chrome.runtime.getURL("popup.html") + "?window=1"));
+    await chrome.tabs.update(tab.id, { url: url.href });
+    const updated = await chrome.windows.update(existing.id, { focused: true, ...(existing.state === "minimized" ? { state: "normal" } : {}) });
+    return { windowId: updated.id };
+  }
+  const created = await chrome.windows.create({ url: url.href, type: "popup", width: 456, height: 650, focused: true });
+  return { windowId: created.id };
+}
+
 async function dashboard() {
-  const [tabs, activeTabs, stored, sessions] = await Promise.all([
-    chrome.tabs.query({}), chrome.tabs.query({ active: true, lastFocusedWindow: true }), profiles(), snapshot()
+  const [tabs, activeTab, stored, sessions] = await Promise.all([
+    chrome.tabs.query({}), activeSourceTab(), profiles(), snapshot()
   ]);
   return {
     tabs: tabs.filter(tab => siteFromUrl(tab.url)).map(tab => ({
       id: tab.id, windowId: tab.windowId, title: tab.title || siteFromUrl(tab.url),
       host: siteFromUrl(tab.url), audible: Boolean(tab.audible), nativeMuted: Boolean(tab.mutedInfo?.muted)
     })),
-    activeTabId: activeTabs[0]?.id, sessions, ...stored
+    activeTabId: activeTab?.id, sessions, ...stored
   };
 }
 
 async function handle(message) {
   switch (message.type) {
     case "dashboard": return dashboard();
+    case "popout": return openMixerWindow(message);
     case "connect": {
       const tab = await chrome.tabs.get(message.tabId);
       const host = siteFromUrl(tab.url);
