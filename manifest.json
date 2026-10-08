@@ -1,0 +1,15 @@
+{
+  "manifest_version": 3,
+  "name": "Sound Enhancer 98",
+  "version": "1.0.0",
+  "description": "A classic desktop mixer for your browser. Boost each tab up to 1000%, adjust its tone, and remember settings per website.",
+  "minimum_chrome_version": "116",
+  "permissions": ["activeTab", "tabs", "tabCapture", "offscreen", "storage"],
+  "background": { "service_worker": "background.js", "type": "module" },
+  "action": {
+    "default_title": "Sound Enhancer 98",
+    "default_popup": "popup.html",
+    "default_icon": { "16": "icons/icon16.png", "32": "icons/icon32.png" }
+  },
+  "icons": { "16": "icons/icon16.png", "32": "icons/icon32.png", "48": "icons/icon48.png", "128": "icons/icon128.png" }
+}

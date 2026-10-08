@@ -1,0 +1,12 @@
+{
+  "name": "sound-enhancer-98",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "node tests/run-tests.js",
+    "preview": "node tools/preview-server.js",
+    "verify:browser": "node tools/verify-browser.js",
+    "package": "node tools/package.js"
+  }
+}

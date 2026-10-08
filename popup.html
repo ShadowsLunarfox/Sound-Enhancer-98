@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light">
+  <title>Sound Enhancer 98</title>
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <div class="window">
+    <header class="title-bar">
+      <div class="title"><img src="icons/speaker.svg" width="18" height="18" alt=""> Sound Enhancer 98</div>
+      <div class="window-buttons"><button id="help-title" class="caption-button" aria-label="Help">?</button><button id="close" class="caption-button" aria-label="Close">×</button></div>
+    </header>
+    <nav class="menu-bar" aria-label="Utilities">
+      <button id="reset-menu"><span class="access-key">R</span>eset mixer</button>
+      <button id="help-menu"><span class="access-key">H</span>elp</button>
+      <span class="version">VERSION 1.0</span>
+    </nav>
+    <div class="tabs" role="tablist" aria-label="Sound controls">
+      <button id="mixer-tab" role="tab" aria-selected="true" aria-controls="mixer-panel" tabindex="0"><span aria-hidden="true">▥</span> Volume mixer</button>
+      <button id="sites-tab" role="tab" aria-selected="false" aria-controls="sites-panel" tabindex="-1"><span aria-hidden="true">▤</span> Websites <span id="site-count" class="count">0</span></button>
+    </div>
+
+    <main id="mixer-panel" role="tabpanel" aria-labelledby="mixer-tab">
+      <div class="source-row">
+        <div id="site-icon" class="site-icon" aria-hidden="true">W</div>
+        <div class="source-select"><label for="tab-select">AUDIO SOURCE <span id="tab-count"></span></label><select id="tab-select" aria-label="Select a browser tab"><option>Loading tabs…</option></select></div>
+        <span id="connection-light" class="connection-light" title="Disconnected"></span>
+      </div>
+
+      <section class="display inset" aria-label="Volume and output level">
+        <div class="volume-display"><span class="display-label">MASTER VOLUME</span><div><output id="volume-readout" for="volume">100</output><span class="percent">%</span><span id="boost-tag" class="boost-tag">1.0×</span></div></div>
+        <div class="meter-display"><div class="meter-header"><span>OUTPUT</span><span id="meter-state">OFFLINE</span></div><div id="meter" class="meter" aria-label="Output level" role="meter" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"></div><div class="meter-scale"><span>−∞</span><span>−12</span><span>0 dB</span></div></div>
+      </section>
+
+      <fieldset class="volume-group"><legend>Volume</legend>
+        <div class="volume-labels"><span>Quiet</span><label class="exact-volume" for="volume-number"><input id="volume-number" type="number" min="0" max="1000" step="1" value="100" aria-label="Exact volume percentage"> %</label><span>LOUD</span></div>
+        <input id="volume" type="range" min="0" max="1000" step="5" value="100" aria-label="Volume percentage">
+        <div class="ticks" aria-hidden="true"><span>0</span><span>250</span><span>500</span><span>750</span><span>1000%</span></div>
+        <div class="quick-volumes" aria-label="Quick volume"><button data-volume="100">100%</button><button data-volume="200">200%</button><button data-volume="500">500%</button><button data-volume="1000">1000%</button></div>
+      </fieldset>
+
+      <fieldset class="tone-group"><legend>Tone &amp; stereo</legend>
+        <div class="tone-controls">
+          <div class="tone-control"><label for="bass">Bass <output id="bass-value" for="bass">0 dB</output></label><input id="bass" type="range" min="-12" max="12" step="1" value="0"><div class="range-ends"><span>−12</span><span>+12 dB</span></div></div>
+          <div class="tone-control"><label for="treble">Treble <output id="treble-value" for="treble">0 dB</output></label><input id="treble" type="range" min="-12" max="12" step="1" value="0"><div class="range-ends"><span>−12</span><span>+12 dB</span></div></div>
+          <div class="tone-control"><label for="balance">Balance <output id="balance-value" for="balance">Center</output></label><input id="balance" type="range" min="-100" max="100" step="1" value="0"><div class="range-ends"><span>L</span><span>R</span></div></div>
+        </div>
+      </fieldset>
+
+      <div class="preset-row"><label for="preset">Sound preset:</label><select id="preset"><option value="custom">Custom</option><option value="flat">Default</option><option value="bass">Bass boost</option><option value="voice">Clear voice</option><option value="movie">Movie night</option></select><button id="reset" title="Restore 100% volume and flat tone">Reset</button></div>
+      <div class="options"><label><input id="limiter" type="checkbox" checked> Reduce clipping <span class="subtle">(limiter)</span></label><label><input id="remember" type="checkbox" checked> Remember settings for each website</label></div>
+      <div id="boost-note" class="boost-note"><span aria-hidden="true">ⓘ</span><span>Boost works best on quiet audio. Start at 100%.</span></div>
+      <div class="actions"><button id="mute" aria-pressed="false"><img src="icons/speaker.svg" width="16" height="16" alt=""><span>Mute</span></button><button id="connect" class="primary-button">Connect this tab</button></div>
+      <p id="hint" class="hint">Connect a tab to start. Your other tabs keep their own volume.</p>
+    </main>
+
+    <section id="sites-panel" role="tabpanel" aria-labelledby="sites-tab" hidden>
+      <div class="panel-heading"><img src="icons/speaker.svg" width="32" height="32" alt=""><div><h1>A little order for your audio.</h1><p>Different websites. Different volume.</p></div></div>
+      <fieldset class="site-list-group"><legend>Saved website settings</legend><div id="site-list" class="site-list inset"></div></fieldset>
+      <p class="site-explainer">Saved settings are restored when you connect a tab on that website. Each connected tab has its own mixer.</p>
+      <div class="tip inset"><strong>A familiar sound. A familiar desktop.</strong><p>Open a website, click the extension in your toolbar, and choose <b>Connect this tab</b>. Repeat for another tab to mix them separately.</p><p>Switch between connected tabs using the audio source menu.</p></div>
+      <button id="back-mixer" class="back-mixer">Back to mixer</button>
+    </section>
+
+    <footer class="status-bar"><span id="status" role="status" aria-live="polite">Ready</span><span id="engine-status">0 tabs connected</span><span class="resize-grip" aria-hidden="true"></span></footer>
+  </div>
+
+  <dialog id="help-dialog">
+    <div class="title-bar"><strong>Sound Enhancer Help</strong><button id="close-help" class="caption-button" aria-label="Close help">×</button></div>
+    <div class="dialog-body"><img src="icons/speaker.svg" width="40" height="40" alt=""><h2>Turn the web up to eleven.</h2><p>1. Open a website that plays audio.<br>2. Click Sound Enhancer in the Chrome toolbar.<br>3. Choose <b>Connect this tab</b> and adjust the mixer.</p><p><b>100% is the original volume.</b> 500% is 5× gain; 1000% is 10×. Bass and treble run from −12 to +12 dB. The limiter reduces peaks, so the perceived boost depends on the source.</p><p>Audio keeps playing when you close this window. Disconnect to restore normal website audio. Moving to a different website disconnects the tab.</p><p>Chrome internal pages and some protected media cannot be captured. This controls browser tabs, not Windows system volume.</p><p class="privacy">All processing happens on your device. Audio is never recorded or uploaded.</p><button id="help-ok">OK</button></div>
+  </dialog>
+  <script type="module" src="popup.js"></script>
+</body>
+</html>
