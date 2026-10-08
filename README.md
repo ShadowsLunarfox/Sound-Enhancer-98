@@ -1,3 +1,8 @@
+
+<p align="center">
+  <img src="icons/icon-source.png" alt="Sound Enhancer 98 logo: a retro Windows panel with a document, speaker, and teal sound waves" width="240">
+</p>
+
 <h1 align="center">ðŸ”Š Sound Enhancer 98</h1>
 
 <p align="center">
@@ -97,6 +102,3 @@ For the project's existing licensing terms, read the **[Terms of Use & License â
 
 ---
 
-<p align="center">
-  <img src="icons/icon-source.png" alt="Sound Enhancer 98 logo: a retro Windows panel with a document, speaker, and teal sound waves" width="240">
-</p>
