@@ -18,6 +18,8 @@
   <kbd>🌐 Chrome 116+</kbd>
 </p>
 
+![Sound Enhancer 98 promotional banner with the supplied logo and Windows 98 styling](store-assets/marquee-promo-1400x560.png)
+
 ---
 
 ## 🎯 Purpose
@@ -50,6 +52,30 @@ Open it from the Chrome toolbar for a quick adjustment, or choose **↗ Pop out*
 
 > [!NOTE]
 > **100% is the original volume.** 500% applies 5× signal gain, and 1000% applies 10×. Perceived loudness depends on the source audio and limiter settings; high gain can still cause distortion.
+
+## 🖼️ Preview Gallery
+
+Explore the Windows 98 interface below. These screenshots use the extension's included preview with sample tabs. Click any screenshot to view it at full size.
+
+### 🔊 Volume up to 1000%
+
+[![Volume mixer preview showing 1000% volume, quick shortcuts, tone controls, and the optional limiter](store-assets/01-volume-boost-1280x800.png)](store-assets/01-volume-boost-1280x800.png)
+
+| 🎚️ Tone & Stereo | 🌐 Website Profiles |
+| :---: | :---: |
+| [![Tone and stereo preview showing the Clear voice preset, bass, treble, and balance controls](store-assets/02-tone-and-stereo-1280x800.png)](store-assets/02-tone-and-stereo-1280x800.png) | [![Website profiles preview showing separate saved volume and tone settings for sample websites](store-assets/03-website-profiles-1280x800.png)](store-assets/03-website-profiles-1280x800.png) |
+| **🪟 Separate Mixer Window** | **🔒 Local Audio Processing** |
+| [![Separate window preview showing the mixer at 500% volume in a resizable browser window](store-assets/04-separate-window-1280x800.png)](store-assets/04-separate-window-1280x800.png) | [![Local audio processing preview showing the extension's help panel and privacy information](store-assets/05-local-audio-1280x800.png)](store-assets/05-local-audio-1280x800.png) |
+
+### 💾 Small Promotional Tile
+
+<p align="center">
+  <a href="store-assets/small-promo-440x280.png">
+    <img src="store-assets/small-promo-440x280.png" alt="Sound Enhancer 98 small promotional tile with the supplied logo, teal desktop, and decorative audio bars" width="440">
+  </a>
+</p>
+
+See the [complete image overview](store-assets/asset-overview.png) for all screenshots and promotional artwork together.
 
 ## 📦 Installation
 
@@ -95,6 +121,8 @@ Closing the mixer leaves connected audio running. Choose **Disconnect this tab**
 ## 🔒 Privacy
 
 Audio processing happens locally on your device. The extension does not record or upload your audio, and website mixer profiles are stored locally in Chrome.
+
+Read the **[Privacy Policy](PRIVACY.md)** for details about tab information, local storage, permissions, and deleting saved profiles.
 
 ## 📜 Terms of Use
 
